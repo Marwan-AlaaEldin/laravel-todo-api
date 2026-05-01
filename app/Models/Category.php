@@ -4,16 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+#[Fillable([ 'user_id','name','color'])]
 
 class Category extends Model
 {
     use HasFactory; // ← ده المهم
 
-    protected $fillable = [
-        'user_id',
-        'name',
-        'color',
-    ]; 
+ 
 
       public function user()
     {
