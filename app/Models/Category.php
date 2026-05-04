@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-#[Fillable([ 'user_id','name','color'])]
+
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+#[Fillable(['user_id', 'name', 'color'])]
 
 class Category extends Model
 {
