@@ -30,21 +30,21 @@ class InitController extends Controller
             sleep(1);
         }
     }
-   public function models()
-{
-    if (!defined('STDIN')) {
-        define('STDIN', fopen('php://stdin', 'r'));
-    }
+    public function models()
+    {
+        if (!defined('STDIN')) {
+            define('STDIN', fopen('php://stdin', 'r'));
+        }
 
-    foreach ($this->models as $model) {
-        Artisan::call('make:model', [
-            'name' => $model,
-        ]);
-        sleep(1);
-    }
+        foreach ($this->models as $model) {
+            Artisan::call('make:model', [
+                'name' => $model,
+            ]);
+            sleep(1);
+        }
 
-    return response()->json(['message' => 'Models created!']);
-}
+        return response()->json(['message' => 'Models created!']);
+    }
 
 
 
@@ -96,5 +96,61 @@ class InitController extends Controller
             ]);
             sleep(1);
         }
+    }
+    public function repositories()
+    {
+        if (!defined('STDIN')) {
+            define('STDIN', fopen('php://stdin', 'r'));
+        }
+
+        // عمل folders
+        if (!is_dir(app_path('Interfaces'))) {
+            mkdir(app_path('Interfaces'));
+        }
+        if (!is_dir(app_path('Repositories'))) {
+            mkdir(app_path('Repositories'));
+        }
+
+        // عمل Interface لكل model
+        foreach ($this->models as $model) {
+            $interfaceContent = "<?php\n\nnamespace App\Interfaces;\n\ninterface {$model}RepositoryInterface\n{\n}\n";
+            file_put_contents(app_path("Interfaces/{$model}RepositoryInterface.php"), $interfaceContent);
+
+            $repositoryContent = "<?php\n\nnamespace App\Repositories;\n\nuse App\Interfaces\\{$model}RepositoryInterface;\n\nclass {$model}Repository implements {$model}RepositoryInterface\n{\n}\n";
+            file_put_contents(app_path("Repositories/{$model}Repository.php"), $repositoryContent);
+        }
+
+        return response()->json(['message' => 'Repositories and Interfaces created!']);
+    }
+
+
+
+
+    public function providers()
+    {
+        if (!defined('STDIN')) {
+            define('STDIN', fopen('php://stdin', 'r'));
+        }
+
+        Artisan::call('make:provider', [
+            'name' => 'RepositoryServiceProvider',
+        ]);
+
+        return response()->json(['message' => 'Provider created!']);
+    }
+
+    public function resources()
+    {
+        if (!defined('STDIN')) {
+            define('STDIN', fopen('php://stdin', 'r'));
+        }
+
+        foreach ($this->models as $model) {
+            Artisan::call('make:resource', [
+                'name' => $model . 'Resource',
+            ]);
+        }
+
+        return response()->json(['message' => 'Resources created!']);
     }
 }

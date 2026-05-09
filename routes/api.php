@@ -20,6 +20,9 @@ Route::prefix('init')->controller(InitController::class)->group(function () {
     Route::get('factories', 'factories');
     Route::get('seeders', 'seeders');
     Route::get('requests', 'requests');
+    Route::get('repositories', 'repositories');
+    Route::get('providers', 'providers');
+    Route::get('resources', 'resources');
 });
 
 Route::prefix('auth')->controller(AuthController::class)->group(function () {
