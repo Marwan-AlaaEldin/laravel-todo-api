@@ -3,33 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Interfaces\CategoryRepositoryInterface;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Resources\CategoryResource;
 
 class CategoryController extends Controller
 {
+    public function __construct(
+        private CategoryRepositoryInterface $categoryRepository
+    ) {}
+
     public function index()
     {
-      /*  $categories = Category::where('user_id', auth()->id())->get();
+        $categories = $this->categoryRepository->getAllForUser(
+            auth()->id(),
+            request()->only(['name'])
+        );
 
-        return response()->json($categories);*/
-          $categories = Category::where('user_id', auth()->id())
-        // فلترة بالاسم لو اتبعت في الـ query string
-        ->when(request('name'), fn($q) => $q->where('name', 'like', '%'.request('name').'%'))
-        ->get();
-
-    return response()->json($categories);
+        return CategoryResource::collection($categories);
     }
 
     public function store(StoreCategoryRequest $request)
     {
-        $category = Category::create([
+        $category = $this->categoryRepository->create([
             'user_id' => auth()->id(),
             'name'    => $request->name,
             'color'   => $request->color ?? '#000000',
         ]);
 
-        return response()->json($category, 201);
+        return new CategoryResource($category);
     }
 
     public function update(UpdateCategoryRequest $request, Category $category)
@@ -38,9 +41,9 @@ class CategoryController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $category->update($request->validated());
+        $category = $this->categoryRepository->update($category, $request->validated());
 
-        return response()->json($category);
+        return new CategoryResource($category);
     }
 
     public function destroy(Category $category)
@@ -49,7 +52,7 @@ class CategoryController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $category->delete();
+        $this->categoryRepository->delete($category);
 
         return response()->json(['message' => 'Category deleted']);
     }
